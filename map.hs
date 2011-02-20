@@ -1,5 +1,6 @@
 -- third shot at a solution for this assignment
 -- http://distributed.etl.luc.edu/homework/assignment-1
+-- to compile: ghc --make map.hs
 -- laufer AT cs DOT luc DOT edu
 -- Sat 19-Feb-2011
 
@@ -122,7 +123,7 @@ main = do
   
   print "shrinking"
   time1 <- getCurrentTime
-  let map2 = shrinkMap (100 - d) (mkStdGen 2) map1
+  let map2 = shrinkMap d (mkStdGen 2) map1
   print $ show $ size map2
   print $ show $ maximum $ elems map2
   time2 <- getCurrentTime
