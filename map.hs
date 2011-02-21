@@ -115,21 +115,21 @@ main = do
 
   print "creating"
   time1 <- getCurrentTime
-  let !map1 = mkMap n $ randomKeysS (k1, k2) $ mkStdGen 1
+  let map1 = mkMap n $ randomKeysS (k1, k2) $ mkStdGen 1
   print $ show $ size map1
   time2 <- getCurrentTime
   print $ show $ diffUTCTime time2 time1
 
   print "shrinking"
   time1 <- getCurrentTime
-  let !map2 = shrinkMap d (mkStdGen 2) map1
+  let map2 = shrinkMap d (mkStdGen 2) map1
   print $ show $ size map2
   time2 <- getCurrentTime
   print $ show $ diffUTCTime time2 time1
 
   print "regrowing"
   time1 <- getCurrentTime
-  let !map3 = growMap n (randomKeysS (k1, k2) $ mkStdGen 3) map2
+  let map3 = growMap n (randomKeysS (k1, k2) $ mkStdGen 3) map2
   print $ show $ size map3
   time2 <- getCurrentTime
   print $ show $ diffUTCTime time2 time1
