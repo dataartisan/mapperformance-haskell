@@ -11,14 +11,15 @@ import Data.Map hiding (map, split)
 import Data.Time.Clock
 import Maybe
 import System (getArgs)
-import System.Exit
+import System.Exit (exitFailure)
 import System.Random
 import System.Random.Shuffle
 
 charRange = ('\000', '\127')
 h = ord (snd charRange) - ord (fst charRange)
 
-checkArgs n d k1 k2 = do
+checkArgs :: (Int, Int, Int, Int) -> IO ()
+checkArgs (n, d, k1, k2) = do
   when (d < 0 || 100 < d) $ do
     print "invalid percentage d"
     exitFailure
@@ -97,42 +98,27 @@ deleteKeys (key : src) m =
     deleteKeys src m'
 -}
 
+takeTime :: String -> (() -> Map a a) -> IO (Map a a)
+takeTime msg task = do
+  print msg
+  time1 <- getCurrentTime
+  let result = task ()
+  print $ show $ size result
+  time2 <- getCurrentTime
+  print $ show $ diffUTCTime time2 time1
+  return result
+
 main :: IO ()
 main = do
   args <- getArgs
   let [n, d, k1, k2] = map (read :: String -> Int) args
-  checkArgs n d k1 k2
+  checkArgs (n, d, k1, k2)
   print $ show [n, d, k1, k2]
-  time0 <- getCurrentTime
-
-{-
-  -- uncomment to check these functions
-  let gen = mkStdGen 0
-  print $ show $ take 100 $ randomChars gen
-  print $ show $ take 100 $ randomKeySizes (k1, k2) gen
-  print $ show $ take 100 $ randomKeysS (k1, k2) gen
--}
-
-  print "creating"
+  
   time1 <- getCurrentTime
-  let map1 = mkMap n $ randomKeysS (k1, k2) $ mkStdGen 1
-  print $ show $ size map1
+  map1 <- takeTime "creating"  (\_ -> mkMap n $ randomKeysS (k1, k2) $ mkStdGen 1)
+  map2 <- takeTime "shrinking" (\_ -> shrinkMap d (mkStdGen 2) map1)
+  map3 <- takeTime "regrowing" (\_ -> growMap n (randomKeysS (k1, k2) $ mkStdGen 3) map2)
   time2 <- getCurrentTime
-  print $ show $ diffUTCTime time2 time1
-
-  print "shrinking"
-  time1 <- getCurrentTime
-  let map2 = shrinkMap d (mkStdGen 2) map1
-  print $ show $ size map2
-  time2 <- getCurrentTime
-  print $ show $ diffUTCTime time2 time1
-
-  print "regrowing"
-  time1 <- getCurrentTime
-  let map3 = growMap n (randomKeysS (k1, k2) $ mkStdGen 3) map2
-  print $ show $ size map3
-  time2 <- getCurrentTime
-  print $ show $ diffUTCTime time2 time1
-
   print "total time"
-  print $ show $ diffUTCTime time2 time0
+  print $ show $ diffUTCTime time2 time1
