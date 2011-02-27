@@ -22,7 +22,7 @@ checkArgs n d k1 k2 = do
   when (d < 0 || 100 < d) $ do
     print "invalid percentage d"
     exitFailure
-  when (toInteger (n `div` 2) > toInteger h ^ toInteger (k2 - k1)) $ do
+  when (2 * toInteger n > toInteger h ^ toInteger (k2 - k1)) $ do
     print "insufficient key range"
     exitFailure
 
